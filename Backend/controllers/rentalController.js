@@ -7,7 +7,7 @@ import asyncHandler from "../utils/asyncHandler.js";
 //rent a book
 const rentTheBook=asyncHandler(async(req,res)=>{
     const {quantity}=req.body
-    const {bookId}=req.params
+    const bookId=req.params.id
     const userId=req.user?._id
     if(!bookId ){
         throw res.json(new apiError(403,"Invalid Book Id"))
@@ -23,7 +23,9 @@ const rentTheBook=asyncHandler(async(req,res)=>{
 
 //get the all books rent details
 const getRentDetails=asyncHandler(async(req,res)=>{
-    const rentDetails=await Rental.find({})
+    const rentDetails=await Rental.find({}).populate({path:"bookId", populate:{path:"author",select:["-role","-password","-accessToken","-createdAt","-updatedAt"]},select:"-stock"})
+                                           .populate({path:"userId",select:["-password","-accessToken","-createdAt","-updatedAt"]})
+                                           .exec()
     if(!rentDetails){
         throw res.json(new apiError(404,"No Data Found"))
     }

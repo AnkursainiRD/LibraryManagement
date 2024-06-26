@@ -22,7 +22,8 @@ const verifyJwt=asyncHandler(async(req,res,next)=>{
 
 //check the author authorization
 const isAuthor=async(req,res,next)=>{
-    if(!req.user?.role===roles[1]){
+    console.log(req.user.role===roles[1]);
+    if(req.user?.role!==roles[1]){
         return res.status(401).json(
             new apiError(401,"Unauthorized Access")
         )

@@ -3,7 +3,7 @@ import { login, logout, myRentedBooks, register } from '../controllers/userContr
 import { deleteBook, getAllBooks, getMyBooks, publishBook, updateBook } from '../controllers/bookController.js';
 import { isAdmin, isAuthor, verifyJwt } from '../middlewares/authMiddleware.js';
 import { createGenre, deleteGenre, getBookByGenre } from '../controllers/genreController.js';
-import { getRentDetails } from '../controllers/rentalController.js';
+import { getRentDetails, rentTheBook } from '../controllers/rentalController.js';
 const router=express.Router()
 
 //authentication routes
@@ -15,11 +15,12 @@ router.route("/logout").post(verifyJwt,logout)
 router.route("/allBooks").get(verifyJwt,getAllBooks)
 router.route("/myRentedBooks").get(verifyJwt,myRentedBooks)
 router.route("/getGrenreBooks").get(verifyJwt,getBookByGenre)
+router.route("/rentTheBook/:id").post(verifyJwt,rentTheBook)
 
 //author authorize routes
 router.route("/publishBook").post(verifyJwt,isAuthor,publishBook)
-router.route("/updateBook").patch(verifyJwt,isAuthor,updateBook)
-router.route("/deletBook").delete(verifyJwt,isAuthor,deleteBook)
+router.route("/updateBook/:id").patch(verifyJwt,isAuthor,updateBook)
+router.route("/deleteBook/:id").delete(verifyJwt,isAuthor,deleteBook)
 router.route("/getMyBooks").get(verifyJwt,isAuthor,getMyBooks)
 
 //admin authorize routes

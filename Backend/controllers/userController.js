@@ -43,12 +43,12 @@ const register=asyncHandler(async (req,res)=>{
 
 //function for login user
 const login=asyncHandler(async(req,res)=>{
-    const {email,password}=req.body
+    const {email,password}=req.body;
     if(!email || !password){
         throw res.json(new apiError(303,"All Credentials Are Required!"))
     }
 
-    const existedUser=await User.findOne(email)
+    const existedUser=await User.findOne({email})
     if(!existedUser){
         throw res.json(new apiError(404,"User Not Found!"))
     }
@@ -92,26 +92,31 @@ const myRentedBooks=asyncHandler(async(req,res)=>{
     const userId=req.user?._id
     const myBooks=await User.aggregate([
         {
-            $match:{_id:mongoose.Types.ObjectId(userId)}
+            $match:{_id:new mongoose.Types.ObjectId(userId)}
         },
         {
             $lookup:{
-                from:"Rental",
+                from:"rentals",
                 foreignField:"userId",
                 localField:"_id",
                 as:"myBooks",
-                pipeline:[
+                pipeline:[  
                     {
                         $lookup:{
                             from:"books",
                             foreignField:"_id",
-                            localField:"$myBooks",
-                            as:"bookDetails"
-                        }
-                    },
-                    {
-                        $addFields:{
-                            bookDetail:{$first:"$bookDetails"}
+                            localField:"bookId",
+                            as:"bookDetails",
+                            pipeline:[
+                                {
+                                    $project:{
+                                        author:1,
+                                        price:1,
+                                        title:1,
+                                        genre:1
+                                    }
+                                }
+                            ]
                         }
                     }
                 ]

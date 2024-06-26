@@ -17,8 +17,7 @@ const bookSchema=new mongoose.Schema({
         required:true
     },
     genre:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"Genre"
+        type:String
     },
     stock:{
         type:Number,

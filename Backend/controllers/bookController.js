@@ -32,10 +32,11 @@ const publishBook=asyncHandler(async(req,res)=>{
 
 //update the book
 const updateBook=asyncHandler(async(req,res)=>{
-    const {bookId}=req.params
+    const bookId=req.params.id
+    console.log(bookId);
     const {title,stock,price,genre}=req.body
     if(!bookId){
-        throw new apiError(404,"Book Not Found!")
+        throw res.json(new apiError(404,"Book Not Found!"))
     }
 
     if(!title || !stock || !price ||!genre){
@@ -53,7 +54,7 @@ const updateBook=asyncHandler(async(req,res)=>{
 
 //delete the book
 const deleteBook=asyncHandler(async(req,res)=>{
-    const {bookId}=req.params
+    const bookId=req.params.id
     if(!bookId){
         throw res.json(new apiError(404,"Book Not Exists"))
     }
@@ -66,7 +67,7 @@ const deleteBook=asyncHandler(async(req,res)=>{
 
 //get all the books
 const getAllBooks=asyncHandler(async(req,res)=>{
-    const allBooks=await Book.find({})
+    const allBooks=await Book.find({}).populate({path:"author",select:["email","userName"]}).exec()
     if(!allBooks){
         throw res.json(new apiError(404,"No Books Found"))
     }
@@ -84,7 +85,7 @@ const getMyBooks=asyncHandler(async(req,res)=>{
     }
     const userBooks=await User.aggregate([
         {
-            $match:{_id: mongoose.Types.ObjectId(userId)}
+            $match:{_id:new mongoose.Types.ObjectId(userId)}
         },
         {
             $lookup:{
@@ -96,7 +97,7 @@ const getMyBooks=asyncHandler(async(req,res)=>{
         },
         {
             $addFields:{
-                authorBooks:{$first:"$authorBooks"}
+                authorBooks:"$authorBooks"
             }
         },
         {
